@@ -3,6 +3,7 @@ version: "3"
 services:
   postgresql:
     image: postgres:${DOCKER_POSTGRESQL_VERSION}-alpine
+    container_name: blog-postgres
     env_file: .env
     restart: always
     environment:
