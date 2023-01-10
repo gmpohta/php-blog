@@ -1,13 +1,13 @@
 version: "3"
 
 services:
-  postgresql:
+  db:
     image: postgres:${DOCKER_POSTGRESQL_VERSION}-alpine
-    container_name: blog-postgres
+    container_name: blog-db
     env_file: .env
     restart: always
     environment:
-      - POSTGRES_PASSWORD=${DOCKER_POSTGRESQL_PASSWORD}
+      POSTGRES_PASSWORD: ${DOCKER_POSTGRESQL_PASSWORD}
     ports:
       - ${DOCKER_POSTGRESQL_EXTERNAL_PORT}:5432
     volumes:
@@ -19,12 +19,13 @@ services:
       args:
         PHP_VERSION: ${DOCKER_PHP_VERSION}
         TIMEZONE: ${DOCKER_TIMEZONE}
+    container_name: blog-php-fpm
     restart: always
     env_file: .env
     volumes:
       - ./:/var/www/app
     external_links:
-      - postgresql
+      - db
 
   php-cli:
     build:
@@ -33,15 +34,17 @@ services:
         PHP_VERSION: ${DOCKER_PHP_VERSION}
         COMPOSER_VERSION: ${DOCKER_COMPOSER_VERSION}
         TIMEZONE: ${DOCKER_TIMEZONE}
+    container_name: blog-php-cli
     volumes:
       - ./:/var/www/app
     external_links:
-      - postgresql
+      - db
 
   nginx:
     image: nginx:${DOCKER_NGINX_VERSION}-alpine
     env_file: .env
     restart: on-failure
+    container_name: blog-nginx
     ports:
       - ${DOCKER_NGINX_EXTERNAL_PORT}:80    
     volumes:
@@ -52,6 +55,7 @@ services:
     image: redis:${DOCKER_REDIS_VERSION}-alpine
     env_file: .env
     restart: on-failure
+    container_name: blog-redis
     ports:
       - ${DOCKER_REDIS_EXTERNAL_PORT}:6379
     volumes:

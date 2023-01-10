@@ -8,13 +8,13 @@ ARG COMPOSER_VERSION
 RUN addgroup -g 1000 app && adduser -u 1000 -G app -s /bin/sh -D app
 
 RUN apk update \
-    && apk add ${PHPIZE_DEPS} curl git postgresql-dev zlib-dev bash-completion libzip-dev libxml2-dev make \
-    freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev icu-dev \
-    jpegoptim optipng  pcre-dev\
-    && pecl install apcu \
+    && apk add --no-cache postgresql-dev zlib-dev autoconf g++ make \
+    libpng libpng-dev libpq-dev \
+    && pecl install apcu \   
     && docker-php-ext-enable apcu \
+    && docker-php-ext-install gd intl pdo pgsql pdo_pgsql \    
     && pecl clear-cache \
-    && apk del ${PHPIZE_DEPS} libpng-dev libjpeg-turbo libjpeg-turbo-dev \
+    && docker-php-source delete \
     && rm -frv /var/cache/apk/* \
     && curl -sS https://getcomposer.org/installer | php -- \
         --install-dir=/usr/bin \

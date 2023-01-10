@@ -7,12 +7,13 @@ ARG TIMEZONE
 RUN addgroup -g 1000 app && adduser -u 1000 -G app -s /bin/sh -D app
 
 RUN apk update \
-    && apk add pcre-dev ${PHPIZE_DEPS} \
+    && apk add --no-cache pcre-dev postgresql-dev zlib-dev autoconf g++ make \
+    libpng libpng-dev libpq-dev \
     && pecl install redis apcu \
     && docker-php-ext-enable redis apcu \
+    && docker-php-ext-install gd opcache pdo pgsql pdo_pgsql intl \
     && pecl clear-cache \
     && docker-php-source delete \
-    && apk del ${PHPIZE_DEPS} \
     &&  rm -frv /var/cache/apk/*
 
 RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
